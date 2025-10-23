@@ -1,0 +1,16 @@
+{
+  "backend": "gpfs",
+  "build_id": "v7.17",
+  "timestamp": "2025-06-01",
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "name": "Cthon",
+      "status": "passed"
+    }
+  ]
+}

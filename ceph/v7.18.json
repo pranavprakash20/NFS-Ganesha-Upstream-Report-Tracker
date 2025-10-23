@@ -1,0 +1,16 @@
+{
+  "backend": "ceph",
+  "build_id": "v7.18",
+  "timestamp": "2025-07-15",
+  "summary": {
+    "passed": 46,
+    "failed": 0,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "name": "Weekly Regression Run",
+      "status": "passed"
+    }
+  ]
+}
