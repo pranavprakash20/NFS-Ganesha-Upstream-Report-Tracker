@@ -1,0 +1,41 @@
+{
+  "backend": "ceph",
+  "build_id": "v9.0-0.1",
+  "timestamp": "2025-10-30",
+  "summary": {
+    "passed": 50,
+    "failed": 1,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "name": "Weekly Regression Run",
+      "status": "passed"
+    },
+    {
+      "name": "Pynfs",
+      "status": "passed"
+    },
+    {
+      "name": "LTP",
+      "status": "passed"
+    },
+    {
+      "name": "Specstorage",
+      "status": "failed",
+      "bug": "1280"
+    },
+    {
+      "name": "Cthon",
+      "status": "passed"
+    },
+    {
+      "name": "Lock Test",
+      "status": "passed"
+    },
+    {
+      "name": "IOZone",
+      "status": "passed"
+    }
+  ]
+}

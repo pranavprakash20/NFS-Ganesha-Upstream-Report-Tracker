@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFS-Ganesha Upstream Report Tracker</title>
+  <link rel="stylesheet" href="./assets/style.css" />
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    :root{
+      --tab-bg: rgba(255,255,255,0.06);
+      --tab-active: linear-gradient(90deg, #00f5d4, #00bbf9);
+    }
+    .layout{ max-width: 95vw !important; width: 95vw !important; }
+    #pie-gpfs, #pie-ceph, #test-trend, #ins-unstable { width: 100%; height: 360px; }
+    .widget .top-controls { display:flex; gap:.5rem; align-items:center; justify-content: space-between; }
+    .widget .top-controls select { background: rgba(255,255,255,0.06); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: .35rem .6rem; }
+    /* Traffic light */
+    .health { display:flex; align-items:center; gap:.6rem; margin-top:.5rem; }
+    .traffic { display:flex; align-items:center; gap:.4rem; }
+    .bulb { width:22px; height:22px; border-radius:50%; background: rgba(255,255,255,0.12); box-shadow: inset 0 0 6px rgba(0,0,0,0.4); opacity:.35; transition: opacity .2s, box-shadow .2s; animation:none; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+    .bulb.green.active  { background:#2ecc71; box-shadow:0 0 14px #2ecc71; opacity:1; animation: blink 1s infinite; }
+    .bulb.yellow.active { background:#f1c40f; box-shadow:0 0 14px #f1c40f; opacity:1; animation: blink 1s infinite; }
+    .bulb.red.active    { background:#e74c3c; box-shadow:0 0 14px #e74c3c; opacity:1; animation: blink .6s infinite; }
+    /* Tabs */
+    .tabs{ display:flex; gap:.5rem; padding:.5rem; background: var(--tab-bg); border-radius:14px; margin: 1rem 0; position: sticky; top: 72px; backdrop-filter: blur(8px); z-index:4; }
+    .tab{ padding:.6rem 1rem; border-radius:999px; border:1px solid rgba(255,255,255,0.15); cursor:pointer; user-select:none; }
+    .tab[data-active="true"]{ background: var(--tab-active); color:#06151a; box-shadow:0 0 16px rgba(0,245,212,0.3); font-weight:700; }
+    section[data-tab]{ display:none; }
+    section[data-tab][data-active="true"]{ display:block; }
+    /* Insights */
+    .insight-controls{ display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:.5rem; }
+    .note{ opacity:.75; font-size:.9rem; }
+    /* === Overview Tab Upsize === */
+    section[data-tab="overview"] .widget { padding: 1.25rem 1.4rem; }
+    section[data-tab="overview"] .title { font-size: 1.45rem; }
+    section[data-tab="overview"] .stat-row { gap: 1rem; }
+    section[data-tab="overview"] .stat-row .pill { font-size: 1.1rem; padding: .55rem .9rem; }
+    section[data-tab="overview"] .health .health-text { font-size: 1.05rem; }
+    section[data-tab="overview"] .traffic .bulb { width: 28px; height: 28px; box-shadow: inset 0 0 8px rgba(0,0,0,0.45); }
+    section[data-tab="overview"] #pie-gpfs,
+    section[data-tab="overview"] #pie-ceph { height: 480px; }
+    @media (min-width: 1600px){
+      section[data-tab="overview"] #pie-gpfs,
+      section[data-tab="overview"] #pie-ceph { height: 560px; }
+    }
+    /* Comments modal */
+    .comment-btn{ cursor:pointer; opacity:.9; }
+    .comment-btn:hover{ opacity:1; text-decoration:underline; }
+    .modal{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:999; }
+    .modal[data-open="true"]{ display:flex; }
+    .modal-card{ background:#0b1720; border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:1rem; width:min(640px, 92vw); box-shadow:0 10px 40px rgba(0,0,0,0.4); }
+    .modal-card h4{ margin:0 0 .5rem 0; }
+    .modal-card textarea{ width:100%; min-height:140px; background:#06151a; color:#e2e8f0; border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:.6rem; }
+    .modal-actions{ margin-top:.75rem; display:flex; gap:.5rem; justify-content:flex-end; }
+    .btn{ padding:.5rem .9rem; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#e2e8f0; cursor:pointer; }
+    .btn.primary{ background:linear-gradient(90deg,#00f5d4,#00bbf9); color:#06151a; border:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>NFS-Ganesha Upstream Report Tracker</h1>
+      <div class="subtitle">Automation results of Upstream NFS-Ganesha with GPFS & CephFS FSAL</div>
+    </div>
+    <button class="glow-btn" id="reset">Reset Filters</button>
+  </header>
+
+  <div class="layout">
+
+    <!-- Tab bar -->
+    <nav class="tabs" id="tabs">
+      <div class="tab" data-target="overview" data-active="true">Overview</div>
+      <div class="tab" data-target="results">Results</div>
+      <div class="tab" data-target="bugtracker">Bug Tracker</div>
+      <div class="tab" data-target="insights">Insights</div>
+    </nav>
+
+    <!-- =================== OVERVIEW TAB =================== -->
+    <section data-tab="overview" data-active="true">
+      <div class="grid grid-2">
+        <div class="widget" id="gpfs-widget">
+          <div class="top-controls">
+            <h3 class="title">GPFS — Summary</h3>
+            <label style="font-size:.9rem; opacity:.85;">Build
+              <select id="gpfs-top-build"></select>
+            </label>
+          </div>
+          <div class="stat-row" style="margin-top:.5rem;">
+            <span class="pill pass">Pass: <span class="val">0</span></span>
+            <span class="pill fail">Fail: <span class="val">0</span></span>
+            <span class="pill skip">Skip: <span class="val">0</span></span>
+          </div>
+          <div class="health" id="gpfs-health">
+            <div class="traffic">
+              <span class="bulb green"></span>
+              <span class="bulb yellow"></span>
+              <span class="bulb red"></span>
+            </div>
+            <span class="health-text">—</span>
+          </div>
+          <div id="pie-gpfs" style="margin-top:.5rem;"></div>
+        </div>
+        <div class="widget" id="ceph-widget">
+          <div class="top-controls">
+            <h3 class="title">CephFS — Summary</h3>
+            <label style="font-size:.9rem; opacity:.85;">Build
+              <select id="ceph-top-build"></select>
+            </label>
+          </div>
+          <div class="stat-row" style="margin-top:.5rem;">
+            <span class="pill pass">Pass: <span class="val">0</span></span>
+            <span class="pill fail">Fail: <span class="val">0</span></span>
+            <span class="pill skip">Skip: <span class="val">0</span></span>
+          </div>
+          <div class="health" id="ceph-health">
+            <div class="traffic">
+              <span class="bulb green"></span>
+              <span class="bulb yellow"></span>
+              <span class="bulb red"></span>
+            </div>
+            <span class="health-text">—</span>
+          </div>
+          <div id="pie-ceph" style="margin-top:.5rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================== RESULTS TAB =================== -->
+    <section data-tab="results">
+      <div class="widget" style="margin-top:1rem;">
+        <h3>Filters</h3>
+        <div class="filters">
+          <label>Run Type</label>
+          <select id="run-type">
+            <option value="gpfs">GPFS</option>
+            <option value="ceph">CephFS</option>
+          </select>
+
+          <label>Build</label>
+          <select id="build-filter">
+            <option value="all">All builds</option>
+          </select>
+
+          <label>Test</label>
+          <select id="test-filter">
+            <option value="all">All tests</option>
+          </select>
+          <button class="btn" id="export-comments" title="Download comments as JSON">Export Comments</button>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>Results</h3>
+        <div style="overflow-x:auto;">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Build</th>
+                <th>Test</th>
+                <th>Status</th>
+                <th>Bug</th>
+                <th>Comment</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="widget" style="margin-top:1rem;">
+        <h3>Test Run History (select Run Type + Test)</h3>
+        <div id="test-trend"></div>
+      </div>
+
+      <div class="widget" style="margin-top:1rem;">
+        <h3>All Reported Bugs (scope: current filters)</h3>
+        <div style="overflow-x:auto;">
+          <table id="bugs-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Build</th>
+                <th>Test</th>
+                <th>Bug</th>
+                <th>Status</th>
+                <th>Last Seen</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================== BUG TRACKER TAB =================== -->
+    <section data-tab="bugtracker">
+      <div class="widget" style="margin-top:1rem;">
+        <div class="top-controls">
+          <h3>Bug Tracker (Config-driven)</h3>
+          <div class="insight-controls">
+            <label>Product
+              <select id="bt-product">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Build
+              <select id="bt-build">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Status
+              <select id="bt-status">
+                <option value="all">All</option>
+                <option value="OPEN">OPEN</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="FIXED">FIXED</option>
+                <option value="CLOSED">CLOSED</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="bt-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Title</th>
+                <th>Introduced In</th>
+                <th>Fixed In</th>
+                <th>Status</th>
+                <th>Last Updated</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="note">Data source: <code>./bugs/live.json</code>. Include fields: id (e.g. BZ-123), product (gpfs|ceph), title, introduced_in, fixed_in (or null), status, last_updated, link.</div>
+    </section>
+
+    <!-- =================== INSIGHTS TAB =================== -->
+    <section data-tab="insights">
+      <div class="widget" style="margin-top:1rem;">
+        <div class="top-controls">
+          <h3>Insights (Global per Backend)</h3>
+          <div class="insight-controls">
+            <label>Backend
+              <select id="ins-backend">
+                <option value="gpfs">GPFS</option>
+                <option value="ceph">CephFS</option>
+              </select>
+            </label>
+            <label>Window
+              <select id="ins-window">
+                <option value="5">Last 5</option>
+                <option value="10">Last 10</option>
+                <option value="20">Last 20</option>
+                <option value="all" selected>All</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="note">These analytics ignore page filters and always compute on the selected backend's history in the chosen window.</div>
+        <div class="grid grid-2" style="margin-top:1rem;">
+          <div>
+            <h4>Top Unstable Tests (by failure rate)</h4>
+            <div id="ins-unstable"></div>
+          </div>
+          <div>
+            <h4>Flaky Tests (pass↔fail flips)</h4>
+            <div style="overflow-x:auto;">
+              <table id="ins-flaky">
+                <thead><tr><th>Test</th><th>Flips</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-2" style="margin-top:1rem;">
+          <div>
+            <h4>New Failures (latest vs previous)</h4>
+            <div style="overflow-x:auto;">
+              <table id="ins-new"><thead><tr><th>Test</th><th>Latest Build</th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+          <div>
+            <h4>Known Failures</h4>
+            <div style="overflow-x:auto;">
+              <table id="ins-known"><thead><tr><th>Test</th><th>Latest Build</th></tr></thead><tbody></tbody></table>
+            </div>
+            <h4 style="margin-top:1rem;">Recovered</h4>
+            <div style="overflow-x:auto;">
+              <table id="ins-recovered"><thead><tr><th>Test</th><th>Previous Build</th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comment Modal -->
+    <div class="modal" id="comment-modal">
+      <div class="modal-card">
+        <h4 id="cm-title">Add Comment</h4>
+        <textarea id="cm-text" placeholder="Type your comment..."></textarea>
+        <div class="modal-actions">
+          <button class="btn" id="cm-cancel">Cancel</button>
+          <button class="btn primary" id="cm-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>© 2025 NFS-Ganesha Dashboard | Team Common Protocol</footer>
+
+  <script>
+    const BUGZILLA_BASE = "https://bugzilla.redhat.com/show_bug.cgi?id="; // change if needed
+
+    // ---------- Tab Handling ----------
+    function setActiveTab(name){
+      if(location.hash !== '#' + name){ history.replaceState(null, '', '#' + name); }
+      document.querySelectorAll('.tab').forEach(t=>{
+        const active = t.getAttribute('data-target')===name; t.setAttribute('data-active', active);
+      });
+      document.querySelectorAll('section[data-tab]').forEach(s=>{
+        const active = s.getAttribute('data-tab')===name; s.setAttribute('data-active', active);
+      });
+      document.querySelector('.layout').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    function initTabs(){
+      const tabs = document.getElementById('tabs');
+      tabs.addEventListener('click', (e)=>{
+        const t = e.target.closest('.tab'); if(!t) return; setActiveTab(t.getAttribute('data-target'));
+      });
+      const initial = (location.hash||'#overview').replace('#','');
+      setActiveTab(initial);
+      window.addEventListener('hashchange', ()=>{ const n=(location.hash||'#overview').replace('#',''); setActiveTab(n); });
+    }
+
+    // ---------- Data helpers ----------
+    async function loadJSON(path){
+      const res = await fetch(path);
+      if(!res.ok) throw new Error(`Failed to load ${path}`);
+      return res.json();
+    }
+    const byTsDesc = (a,b) => new Date(b.timestamp) - new Date(a.timestamp);
+
+    function setWidget(elId, titlePrefix, build){
+      const el = document.getElementById(elId);
+      const p = build.summary.passed;
+      const f = build.summary.failed;
+      const s = build.summary.skipped;
+      el.querySelector('.title').textContent = `${titlePrefix} — ${build.build_id}`;
+      const vals = el.querySelectorAll('.val');
+      vals[0].textContent = p; vals[1].textContent = f; vals[2].textContent = s;
+    }
+
+    // SAFE pie renderer with explicit colors
+    function renderPie(divId, title, p, f, s){
+      Plotly.newPlot(
+        divId,
+        [{
+          values: [p, f, s],
+          labels: ['Passed', 'Failed', 'Skipped'],
+          type: 'pie',
+          marker: { colors: ['#2ecc71', '#e74c3c', '#f1c40f'] } // green, red, yellow
+        }],
+        { title, paper_bgcolor: 'rgba(0,0,0,0)', responsive: true }
+      );
+    }
+
+    function setTraffic(healthContainerId, p, f, s){
+      const el = document.getElementById(healthContainerId);
+      const bulbs = el.querySelectorAll('.bulb');
+      bulbs.forEach(b=>b.classList.remove('active'));
+
+      const passed = p || 0;
+      const failed = f || 0;
+      const skipped = s || 0;
+      const total = Math.max(1, passed + failed + skipped);
+      const failRate = (failed / total) * 100;
+      const text = el.querySelector('.health-text');
+
+      // New rule: Healthy only if we have at least one pass and zero failures
+      if (failed === 0 && passed > 0) {
+        bulbs[0].classList.add('active');
+        text.textContent = `Healthy (0% failures)`;
+        return;
+      }
+
+      // All (or only) skipped: not healthy -> warning
+      if (failed === 0 && passed === 0 && skipped > 0) {
+        bulbs[1].classList.add('active');
+        text.textContent = `Warning (no tests executed; all skipped)`;
+        return;
+      }
+
+      // Otherwise, use failure rate thresholds
+      if (failRate < 5) {
+        bulbs[1].classList.add('active');
+        text.textContent = `Warning (${failRate.toFixed(1)}% failures)`;
+      } else {
+        bulbs[2].classList.add('active');
+        text.textContent = `Critical (${failRate.toFixed(1)}% failures)`;
+      }
+    }
+
+    function toStatusNum(s){ return s==='passed'?1:(s==='failed'?0:0.5); }
+
+    // simple in-memory cache for build JSONs
+    const cache = new Map();
+    async function loadBuild(rt, file){
+      const key = `${rt}/${file}`;
+      if(cache.has(key)) return cache.get(key);
+      const data = await loadJSON(`./${key}`);
+      cache.set(key, data);
+      return data;
+    }
+
+    // ---------- Comments storage ----------
+    function commentKey(runType, buildId, testName){
+      return `comment::${runType}::${buildId}::${testName}`;
+    }
+    function getComment(runType, buildId, testName, fallback){
+      const k = commentKey(runType, buildId, testName);
+      return localStorage.getItem(k) ?? fallback ?? '';
+    }
+    function setComment(runType, buildId, testName, text){
+      const k = commentKey(runType, buildId, testName);
+      if(text && text.trim().length){ localStorage.setItem(k, text.trim()); }
+      else { localStorage.removeItem(k); }
+    }
+    function exportAllComments(){
+      const out = [];
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(!k.startsWith('comment::')) continue;
+        const [, runType, buildId, testName] = k.split('::');
+        out.push({ runType, buildId, testName, comment: localStorage.getItem(k) });
+      }
+      const blob = new Blob([JSON.stringify({comments: out}, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'comments-export.json';
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    async function main(){
+      initTabs();
+
+      const [gpfsM, cephM] = await Promise.all([
+        loadJSON('./gpfs/manifest.json'),
+        loadJSON('./ceph/manifest.json')
+      ]);
+
+      // Try loading central bug config (optional)
+      let bugCfg = { bugs: [] };
+      try { bugCfg = await loadJSON('./bugs/live.json'); console.log('Loaded live bugs'); }
+      catch(e1){
+        console.warn('live.json not found; falling back to bugs.json');
+        try { bugCfg = await loadJSON('./bugs/bugs.json'); } catch(e2){ console.warn('bugs.json not found (optional)'); }
+      }
+      // --- Populate top build selectors (default to latest) ---
+      const gpfsTopSel = document.getElementById('gpfs-top-build');
+      const cephTopSel = document.getElementById('ceph-top-build');
+      const gpfsSorted = [...gpfsM.builds].sort(byTsDesc);
+      const cephSorted = [...cephM.builds].sort(byTsDesc);
+
+      function fillTopSelect(selectEl, builds){
+        selectEl.innerHTML = '';
+        builds.forEach(b => { const o=document.createElement('option'); o.value=b.build_id; o.textContent=b.build_id; selectEl.appendChild(o); });
+        if(builds.length) selectEl.value = builds[0].build_id; // latest by default
+      }
+      fillTopSelect(gpfsTopSel, gpfsSorted);
+      fillTopSelect(cephTopSel, cephSorted);
+
+      function findBuild(manifest, buildId){ return manifest.builds.find(b => b.build_id === buildId); }
+
+      function updateTop(backend){
+        if(backend==='gpfs'){
+          const selId = gpfsTopSel.value;
+          const b = findBuild(gpfsM, selId) || gpfsSorted[0];
+          setWidget('gpfs-widget','GPFS — Summary', b);
+          renderPie('pie-gpfs', `GPFS ${b.build_id}`, b.summary.passed, b.summary.failed, b.summary.skipped);
+          setTraffic('gpfs-health', b.summary.passed, b.summary.failed, b.summary.skipped);
+        } else {
+          const selId = cephTopSel.value;
+          const b = findBuild(cephM, selId) || cephSorted[0];
+          setWidget('ceph-widget','CephFS — Summary', b);
+          renderPie('pie-ceph', `CephFS ${b.build_id}`, b.summary.passed, b.summary.failed, b.summary.skipped);
+          setTraffic('ceph-health', b.summary.passed, b.summary.failed, b.summary.skipped);
+        }
+      }
+
+      // Initial top render
+      updateTop('gpfs');
+      updateTop('ceph');
+
+      // React on top selectors change
+      gpfsTopSel.addEventListener('change', () => updateTop('gpfs'));
+      cephTopSel.addEventListener('change', () => updateTop('ceph'));
+
+      // --- RESULTS TAB: Filters & table (scoped) ---
+      const runType = document.getElementById('run-type');
+      const buildSel = document.getElementById('build-filter');
+      const testSel = document.getElementById('test-filter');
+      const tbody = document.querySelector('#results-table tbody');
+      const bugsBody = document.querySelector('#bugs-table tbody');
+
+      function currentManifest(){ return runType.value==='gpfs' ? gpfsM : cephM; }
+      function currentBackend(){ return runType.value.toUpperCase(); }
+
+      async function refreshFilters(){
+        const M = currentManifest();
+        buildSel.innerHTML = '<option value="all">All builds</option>';
+        [...M.builds].sort(byTsDesc).forEach(b => {
+          const opt = document.createElement('option'); opt.value = b.build_id; opt.textContent = b.build_id; buildSel.appendChild(opt);
+        });
+        const names = new Set();
+        for(const b of M.builds){ const full = await loadBuild(runType.value, b.file); for(const t of full.tests) names.add(t.name); }
+        testSel.innerHTML = '<option value="all">All tests</option>';
+        [...names].sort().forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; testSel.appendChild(o); });
+      }
+
+      async function renderTable(){
+        const M = currentManifest();
+        const bFilter = buildSel.value; const tFilter = testSel.value;
+        const buildsSorted = [...M.builds].sort(byTsDesc);
+        tbody.innerHTML = '';
+        for(const b of buildsSorted){
+          if(bFilter!=='all' && b.build_id!==bFilter) continue;
+          const full = await loadBuild(runType.value, b.file);
+          for(const t of full.tests){
+            if(tFilter!=='all' && t.name!==tFilter) continue;
+            const tr = document.createElement('tr');
+            const color = t.status==='passed'? 'pass' : (t.status==='failed'?'fail':'skip');
+            const bugHtml = t.bug ? `<a href="${BUGZILLA_BASE}${(t.bug+"").split('-').pop()}" target="_blank">${t.bug}</a>` : '-';
+            const comment = getComment(runType.value, b.build_id, t.name, t.comment);
+            const cta = `<span class="comment-btn" data-edit="true" data-run="${runType.value}" data-build="${b.build_id}" data-test="${t.name}">${comment? 'Edit' : 'Add'} Comment</span>`;
+            tr.innerHTML = `<td>${currentBackend()}</td><td>${b.build_id}</td><td>${t.name}</td><td><span class="pill ${color}">${t.status}</span></td><td>${bugHtml}</td><td>${comment? comment.replace(/</g,'&lt;') : ''} ${cta}</td><td>${new Date(full.timestamp).toLocaleString()}</td>`;
+            tbody.appendChild(tr);
+          }
+        }
+      }
+
+      async function renderBugs(){
+        const M = currentManifest();
+        const bFilter = buildSel.value; const tFilter = testSel.value;
+        const buildsSorted = [...M.builds].sort(byTsDesc);
+        bugsBody.innerHTML = '';
+        const byBug = new Map();
+        for(const b of buildsSorted){
+          if(bFilter!=='all' && b.build_id!==bFilter) continue;
+          const full = await loadBuild(runType.value, b.file);
+          const ts = new Date(full.timestamp).getTime();
+          for(const t of full.tests){
+            if(!t.bug) continue;
+            if(tFilter!=='all' && t.name!==tFilter) continue;
+            const bugId = (t.bug+"").split('-').pop();
+            const prev = byBug.get(bugId);
+            if(!prev || ts > prev.ts){
+              byBug.set(bugId, { type: currentBackend(), build: b.build_id, test: t.name, status: t.status, ts, bug: t.bug });
+            }
+          }
+        }
+        const rows = [...byBug.values()].sort((a,b)=>b.ts-a.ts);
+        for(const r of rows){
+          const tr = document.createElement('tr');
+          const color = r.status==='passed'? 'pass' : (r.status==='failed'?'fail':'skip');
+          const bugLink = `<a href="${BUGZILLA_BASE}${(r.bug+"").split('-').pop()}" target="_blank">${r.bug}</a>`;
+          tr.innerHTML = `<td>${r.type}</td><td>${r.build}</td><td>${r.test}</td><td>${bugLink}</td><td><span class="pill ${color}">${r.status}</span></td><td>${new Date(r.ts).toLocaleString()}</td>`;
+          bugsBody.appendChild(tr);
+        }
+      }
+
+      async function renderTestTrend(){
+        const M = currentManifest();
+        const tFilter = testSel.value;
+        const buildsSorted = [...M.builds].sort(byTsDesc);
+        if(tFilter==='all'){
+          Plotly.newPlot('test-trend', [{x:[0],y:[0], type:'scatter'}], { title:'Select a Test to view its history', paper_bgcolor:'rgba(0,0,0,0)' });
+          return;
+        }
+        const X=[]; const Y=[];
+        for(const b of buildsSorted){
+          const full = await loadBuild(runType.value, b.file);
+          const found = full.tests.find(x=>x.name===tFilter);
+          if(found){ X.push(b.build_id); Y.push(toStatusNum(found.status)); }
+        }
+        Plotly.newPlot('test-trend', [{ x: X.reverse(), y: Y.reverse(), mode:'lines+markers', name: tFilter }], {
+          title:`${currentBackend()} • ${tFilter} — Historical Status`,
+          yaxis:{range:[-0.1,1.1], tickvals:[0,0.5,1], ticktext:['Fail','Skip','Pass']},
+          paper_bgcolor:'rgba(0,0,0,0)'
+        });
+      }
+
+      // ---------- INSIGHTS (GLOBAL PER BACKEND) ----------
+      const insBackend = document.getElementById('ins-backend');
+      const insWindow = document.getElementById('ins-window');
+      const insFlakyBody = document.querySelector('#ins-flaky tbody');
+      const insNewBody = document.querySelector('#ins-new tbody');
+      const insKnownBody = document.querySelector('#ins-known tbody');
+      const insRecoveredBody = document.querySelector('#ins-recovered tbody');
+
+      async function computeWindow(manifest, n){
+        const all = [...manifest.builds].sort(byTsDesc);
+        if(n==='all') return all;
+        const k = Math.max(1, parseInt(n,10));
+        return all.slice(0,k);
+      }
+
+      async function renderInsights(){
+        const backend = insBackend.value; // gpfs|ceph
+        const M = backend==='gpfs'? gpfsM : cephM;
+        const win = await computeWindow(M, insWindow.value);
+
+        // Load all build files in window
+        const builds = [];
+        for(const b of win){ builds.push(await loadBuild(backend, b.file)); }
+
+        // ----- Unstable tests (failure rate) -----
+        const attempts = new Map(); // test -> count present
+        const fails = new Map();    // test -> failures across window
+        for(const b of builds){
+          for(const t of b.tests){
+            attempts.set(t.name, (attempts.get(t.name)||0) + 1);
+            if(t.status==='failed') fails.set(t.name, (fails.get(t.name)||0)+1);
+          }
+        }
+        const rates = [];
+        attempts.forEach((cnt, name)=>{
+          const f = fails.get(name)||0;
+          rates.push({name, rate: cnt? (f/cnt*100):0, f, cnt});
+        });
+        rates.sort((a,b)=> b.rate - a.rate);
+        const top = rates.slice(0,10);
+        Plotly.newPlot('ins-unstable', [{ x: top.map(x=>x.name), y: top.map(x=>Math.round(x.rate*10)/10), type:'bar', text: top.map(x=>`${x.f}/${x.cnt}`) }], { title:'Failure rate (%)', paper_bgcolor:'rgba(0,0,0,0)'});
+
+        // ----- Flaky tests (pass/fail flips) -----
+        insFlakyBody.innerHTML='';
+        const byTestStatuses = new Map(); // test -> [status over time newest->oldest]
+        for(const b of win){
+          const full = await loadBuild(backend, b.file);
+          for(const t of full.tests){
+            const arr = byTestStatuses.get(t.name)||[];
+            arr.push(t.status);
+            byTestStatuses.set(t.name, arr);
+          }
+        }
+        function bin(s){ return s==='failed'?0:(s==='passed'?1:null); }
+        const flips = [];
+        byTestStatuses.forEach((arr, name)=>{
+          let f=0; let prev = bin(arr[0]);
+          for(let i=1;i<arr.length;i++){
+            const cur = bin(arr[i]);
+            if(prev===null || cur===null){ prev = cur; continue; }
+            if(cur!==prev) f++;
+            prev = cur;
+          }
+          if(f>0) flips.push({name, flips:f});
+        });
+        flips.sort((a,b)=> b.flips - a.flips);
+        for(const row of flips.slice(0,20)){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${row.name}</td><td>${row.flips}</td>`;
+          insFlakyBody.appendChild(tr);
+        }
+
+        // ----- New / Known / Recovered (latest vs previous) -----
+        insNewBody.innerHTML=''; insKnownBody.innerHTML=''; insRecoveredBody.innerHTML='';
+        if(win.length>=2){
+          const latest = await loadBuild(backend, win[0].file);
+          const prev = await loadBuild(backend, win[1].file);
+          const prevFailed = new Set(prev.tests.filter(t=>t.status==='failed').map(t=>t.name));
+          const latestFailed = new Set(latest.tests.filter(t=>t.status==='failed').map(t=>t.name));
+          [...latestFailed].filter(t=>!prevFailed.has(t)).forEach(t=>{
+            const tr = document.createElement('tr'); tr.innerHTML=`<td>${t}</td><td>${latest.build_id}</td>`; insNewBody.appendChild(tr);
+          });
+          [...latestFailed].filter(t=>prevFailed.has(t)).forEach(t=>{
+            const tr = document.createElement('tr'); tr.innerHTML=`<td>${t}</td><td>${latest.build_id}</td>`; insKnownBody.appendChild(tr);
+          });
+          [...prevFailed].filter(t=>!latestFailed.has(t)).forEach(t=>{
+            const tr = document.createElement('tr'); tr.innerHTML=`<td>${t}</td><td>${prev.build_id}</td>`; insRecoveredBody.appendChild(tr);
+          });
+        }
+      }
+
+      // ---------- BUG TRACKER (CONFIG-DRIVEN) ----------
+      const btProduct = document.getElementById('bt-product');
+      const btBuild = document.getElementById('bt-build');
+      const btStatus = document.getElementById('bt-status');
+      const btBody = document.querySelector('#bt-table tbody');
+
+      function refreshBugTrackerFilters(){
+        const products = new Set(['gpfs','ceph']);
+        const builds = new Set();
+        (bugCfg.bugs||[]).forEach(b=>{ if(b.product) products.add(String(b.product).toLowerCase()); if(b.introduced_in) builds.add(b.introduced_in); if(b.fixed_in) builds.add(b.fixed_in); });
+        btProduct.innerHTML = '<option value="all">All</option>' + [...products].map(p=>`<option value="${p}">${p.toUpperCase()}</option>`).join('');
+        const buildOpts = ['<option value="all">All</option>', ...[...builds].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(b=>`<option value="${b}">${b}</option>`)];
+        btBuild.innerHTML = buildOpts.join('');
+      }
+
+      function renderBugTracker(){
+        btBody.innerHTML = '';
+        const p = btProduct.value;
+        const b = btBuild.value;
+        const s = btStatus.value;
+        const items = (bugCfg.bugs||[]).filter(x=>{
+          const okP = (p==='all') || (String(x.product).toLowerCase()===p);
+          const okS = (s==='all') || (String(x.status).toUpperCase()===s);
+          const okB = (b==='all') || (x.introduced_in===b || (x.fixed_in && x.fixed_in===b));
+          return okP && okS && okB;
+        }).sort((a,b)=> (b.last_updated||'').localeCompare(a.last_updated||''));
+        for(const r of items){
+          const id = r.id || '-';
+          const link = r.link ? `<a href="${r.link}" target="_blank">${id}</a>` : id;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${link}</td><td>${(r.product||'').toString().toUpperCase()}</td><td>${r.title||'-'}</td><td>${r.introduced_in||'-'}</td><td>${r.fixed_in||'-'}</td><td>${r.status||'-'}</td><td>${r.last_updated? new Date(r.last_updated).toLocaleString() : '-'}</td>`;
+          btBody.appendChild(tr);
+        }
+      }
+
+      // Bind insights controls
+      document.getElementById('ins-backend').addEventListener('change', renderInsights);
+      document.getElementById('ins-window').addEventListener('change', renderInsights);
+
+      // Bind bug tracker controls
+      btProduct.addEventListener('change', renderBugTracker);
+      btBuild.addEventListener('change', renderBugTracker);
+      btStatus.addEventListener('change', renderBugTracker);
+
+      // Comment modal handlers
+      const cm = document.getElementById('comment-modal');
+      const cmTitle = document.getElementById('cm-title');
+      const cmText = document.getElementById('cm-text');
+      let cmCtx = null;
+      document.body.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-edit]');
+        if(btn){
+          const run = btn.getAttribute('data-run');
+          const build = btn.getAttribute('data-build');
+          const test = btn.getAttribute('data-test');
+          cmCtx = {run, build, test};
+          cmTitle.textContent = `Comment — ${run.toUpperCase()} · ${build} · ${test}`;
+          cmText.value = getComment(run, build, test, '');
+          cm.setAttribute('data-open','true');
+        }
+      });
+      document.getElementById('cm-cancel').addEventListener('click', ()=>{ cm.removeAttribute('data-open'); cmCtx=null; });
+      document.getElementById('cm-save').addEventListener('click', ()=>{
+        if(cmCtx){ setComment(cmCtx.run, cmCtx.build, cmCtx.test, cmText.value); }
+        cm.removeAttribute('data-open'); cmCtx=null; renderTable();
+      });
+      document.getElementById('export-comments').addEventListener('click', exportAllComments);
+
+      // Initial renders
+      await refreshFilters();
+      await renderTable();
+      await renderTestTrend();
+      await renderBugs();
+      await renderInsights();
+      refreshBugTrackerFilters();
+      renderBugTracker();
+
+      // Reset
+      document.getElementById('reset').addEventListener('click', async ()=>{
+        document.getElementById('run-type').value='gpfs';
+        await refreshFilters();
+        await renderTable();
+        await renderTestTrend();
+        await renderBugs();
+        await renderInsights();
+        setActiveTab('overview');
+      });
+
+      // Filters listeners
+      document.getElementById('run-type').addEventListener('change', async ()=>{ await refreshFilters(); await renderTable(); await renderTestTrend(); await renderBugs(); });
+      document.getElementById('build-filter').addEventListener('change', async ()=>{ await renderTable(); await renderBugs(); });
+      document.getElementById('test-filter').addEventListener('change', async ()=>{ await renderTable(); await renderTestTrend(); await renderBugs(); });
+    }
+
+    window.addEventListener('DOMContentLoaded', main);
+  </script>
+</body>
+</html>
