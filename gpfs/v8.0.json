@@ -1,0 +1,38 @@
+{
+  "backend": "gpfs",
+  "build_id": "v8.0",
+  "timestamp": "2025-10-22T10:00:00Z",
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "skipped": 2
+  },
+  "tests": [
+    {
+      "name": "Pynfs",
+      "status": "skipped"
+    },
+    {
+      "name": "Cthon",
+      "status": "skipped"
+    },
+    {
+      "name": "LTP",
+      "status": "passed"
+    },
+    {
+      "name": "LockTest",
+      "status": "passed"
+    },
+    {
+      "name": "Racer",
+      "status": "failed",
+      "bug": "BZ-127"
+    },
+    {
+      "name": "Dirstress",
+      "status": "failed",
+      "bug": "BZ-134"
+    }
+  ]
+}

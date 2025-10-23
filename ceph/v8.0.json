@@ -1,0 +1,38 @@
+{
+  "backend": "ceph",
+  "build_id": "v8.0",
+  "timestamp": "2025-10-22T10:00:00Z",
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "skipped": 1
+  },
+  "tests": [
+    {
+      "name": "Pynfs",
+      "status": "passed"
+    },
+    {
+      "name": "Cthon",
+      "status": "failed",
+      "bug": "BZ-130"
+    },
+    {
+      "name": "LTP",
+      "status": "passed"
+    },
+    {
+      "name": "LockTest",
+      "status": "failed",
+      "bug": "BZ-121"
+    },
+    {
+      "name": "Racer",
+      "status": "skipped"
+    },
+    {
+      "name": "Dirstress",
+      "status": "passed"
+    }
+  ]
+}
