@@ -1,0 +1,154 @@
+{
+  "bugs": [
+    {
+      "id": "BZ-2264146",
+      "product": "ceph",
+      "title": "[NFS Ganesha] Ganesha got crashed and dumped core in ino_release_cb  while running the scale test for 1500 exports and 100 clients -",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "CLOSED",
+      "last_updated": "2025-09-18T15:34:38Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2264146"
+    },
+    {
+      "id": "BZ-2394513",
+      "product": "ceph",
+      "title": "NFS-Ganesha LTP failures",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "ASSIGNED",
+      "last_updated": "2025-09-16T14:34:41Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394513"
+    },
+    {
+      "id": "BZ-2394514",
+      "product": "ceph",
+      "title": "NFS-Ganesha crashes with LTP",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "CLOSED",
+      "last_updated": "2025-10-14T09:12:37Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394514"
+    },
+    {
+      "id": "BZ-2394515",
+      "product": "ceph",
+      "title": "NFS Ganesha crashes while running SpecStorage tool",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "ASSIGNED",
+      "last_updated": "2025-10-08T05:01:21Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394515"
+    },
+    {
+      "id": "BZ-2394516",
+      "product": "ceph",
+      "title": "[4.0] pynfs test suite failures.",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "ASSIGNED",
+      "last_updated": "2025-10-27T10:23:50Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394516"
+    },
+    {
+      "id": "BZ-2394517",
+      "product": "ceph",
+      "title": "[4.1] pynfs test suite failures",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "ASSIGNED",
+      "last_updated": "2025-09-29T05:37:22Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394517"
+    },
+    {
+      "id": "BZ-2394518",
+      "product": "ceph",
+      "title": "nfs-ganesha crash with SIGABRT in libcephfs ObjectCacher during inode cleanup",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "CLOSED",
+      "last_updated": "2025-11-04T02:40:32Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394518"
+    },
+    {
+      "id": "BZ-2394519",
+      "product": "ceph",
+      "title": "NFS-Ganesha crash in NFSv3 remove path \u2013 fsal_internal_close assertion failure (fd=-1)",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "ASSIGNED",
+      "last_updated": "2025-09-16T14:45:21Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394519"
+    },
+    {
+      "id": "BZ-2394589",
+      "product": "ceph",
+      "title": "[Crash][NFS-Ganesha]: Cthon - File attribute sync operation",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "CLOSED",
+      "last_updated": "2025-09-23T03:49:45Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394589"
+    },
+    {
+      "id": "BZ-2394830",
+      "product": "ceph",
+      "title": "[Crash][NFS-Ganesha]: Cthon - xlist hit assertion",
+      "introduced_in": "8.1",
+      "fixed_in": "-",
+      "status": "CLOSED",
+      "last_updated": "2025-09-23T03:43:49Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394830"
+    },
+    {
+      "id": "BZ-2397583",
+      "product": "ceph",
+      "title": "[BLOCKER]: Build failure for NFS-Ganesha 7.1 in downstream (Ceph zerocopy API incompatibility)",
+      "introduced_in": "9.0",
+      "fixed_in": "-",
+      "status": "VERIFIED",
+      "last_updated": "2025-10-11T09:30:17Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2397583"
+    },
+    {
+      "id": "BZ-2402185",
+      "product": "ceph",
+      "title": "Pynfs tests fails with operation OP_OPEN should return NFS4_OK, instead got NFS4ERR_GRACE",
+      "introduced_in": "7.1",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-10-16T06:27:16Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2402185"
+    },
+    {
+      "id": "BZ-2403684",
+      "product": "ceph",
+      "title": "[NFS-Ganesha] [8.0] New LTP failures with latest build",
+      "introduced_in": "8.0",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-10-14T04:57:45Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2403684"
+    },
+    {
+      "id": "BZ-2405281",
+      "product": "ceph",
+      "title": "[8.1][Upstream] RPM build fails with latest nfs-ganesha version",
+      "introduced_in": "8.1",
+      "fixed_in": "-",
+      "status": "POST",
+      "last_updated": "2025-10-31T11:58:19Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2405281"
+    },
+    {
+      "id": "BZ-2411947",
+      "product": "ceph",
+      "title": "[NFS-Ganesha] With root_squash enabled operations on mount point fails",
+      "introduced_in": "8.1",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-11-04T09:06:51Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2411947"
+    }
+  ]
+}

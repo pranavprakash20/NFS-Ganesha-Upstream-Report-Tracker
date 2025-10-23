@@ -1,0 +1,35 @@
+{
+  "backend": "ceph",
+  "build_id": "v7.19",
+  "timestamp": "2025-07-21",
+  "summary": {
+    "passed": 46,
+    "failed": 0,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "name": "Weekly Regression Run",
+      "status": "passed"
+    },
+    {
+      "name": "Cthon",
+      "status": "passed"
+    },
+    {
+      "name": "Pynfs",
+      "status": "failed",
+      "bug": "1288,1287,1323"
+    },
+    {
+      "name": "LTP",
+      "status": "failed",
+      "bug": "1309,1308"
+    },
+    {
+      "name": "Specstorage",
+      "status": "failed",
+      "bug": "1280"
+    }
+  ]
+}

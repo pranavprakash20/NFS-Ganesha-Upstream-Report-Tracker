@@ -1,0 +1,42 @@
+{
+  "backend": "gpfs",
+  "build_id": "v9.0-0.1",
+  "timestamp": "2025-10-30",
+ "summary": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 6
+  },
+  "tests": [
+    {
+      "name": "Pynfs",
+      "status": "skipped",
+      "bug": "2402185, 2411947"
+    },
+    {
+      "name": "Cthon",
+      "status": "skipped",
+      "bug": "2411947"
+    },
+    {
+      "name": "LTP",
+      "status": "skipped",
+      "bug": "2411947"
+    },
+    {
+      "name": "Long Running",
+      "status": "skipped",
+      "bug": "2411947"
+    },
+    {
+      "name": "Lock Test",
+      "status": "skipped",
+      "bug": "2411947"
+    },
+    {
+      "name": "IOZone",
+      "status": "skipped",
+      "bug": "2411947"
+    }
+  ]
+}

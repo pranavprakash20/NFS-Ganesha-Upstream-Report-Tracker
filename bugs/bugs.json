@@ -1,0 +1,24 @@
+{
+  "bugs": [
+    {
+      "id": "BZ-101",
+      "product": "ceph",
+      "title": "Cthon failures on v8.0",
+      "introduced_in": "v8.0",
+      "fixed_in": "v8.1",
+      "status": "FIXED",
+      "last_updated": "2025-10-23T12:10:00Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=101"
+    },
+    {
+      "id": "BZ-95",
+      "product": "gpfs",
+      "title": "Pynfs lock issue",
+      "introduced_in": "v8.0",
+      "fixed_in": null,
+      "status": "OPEN",
+      "last_updated": "2025-10-22T09:20:00Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=95"
+    }
+  ]
+}

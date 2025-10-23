@@ -1,0 +1,33 @@
+{
+  "backend": "gpfs",
+  "build_id": "v7.3",
+  "timestamp": "2025-10-08",
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "name": "Pynfs",
+      "status": "failed",
+      "bug": "2402185"
+    },
+    {
+      "name": "Cthon",
+      "status": "passed"
+    },
+    {
+      "name": "LTP",
+      "status": "passed"
+    },
+    {
+      "name": "Long Running",
+      "status": "passed"
+    },
+    {
+      "name": "Lock Test",
+      "status": "passed"
+    }
+  ]
+}
