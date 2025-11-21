@@ -47,7 +47,7 @@
       "introduced_in": "7.1",
       "fixed_in": "-",
       "status": "ASSIGNED",
-      "last_updated": "2025-10-27T10:23:50Z",
+      "last_updated": "2025-11-17T13:39:21Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394516"
     },
     {
@@ -57,7 +57,7 @@
       "introduced_in": "7.1",
       "fixed_in": "-",
       "status": "ASSIGNED",
-      "last_updated": "2025-09-29T05:37:22Z",
+      "last_updated": "2025-11-17T13:40:20Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394517"
     },
     {
@@ -116,8 +116,8 @@
       "title": "Pynfs tests fails with operation OP_OPEN should return NFS4_OK, instead got NFS4ERR_GRACE",
       "introduced_in": "7.1",
       "fixed_in": "-",
-      "status": "NEW",
-      "last_updated": "2025-10-16T06:27:16Z",
+      "status": "ASSIGNED",
+      "last_updated": "2025-11-11T19:14:17Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2402185"
     },
     {
@@ -127,7 +127,7 @@
       "introduced_in": "8.0",
       "fixed_in": "-",
       "status": "NEW",
-      "last_updated": "2025-10-14T04:57:45Z",
+      "last_updated": "2025-11-14T05:58:34Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2403684"
     },
     {
@@ -137,7 +137,7 @@
       "introduced_in": "8.1",
       "fixed_in": "-",
       "status": "POST",
-      "last_updated": "2025-10-31T11:58:19Z",
+      "last_updated": "2025-11-17T14:38:32Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2405281"
     },
     {
@@ -146,9 +146,49 @@
       "title": "[NFS-Ganesha] With root_squash enabled operations on mount point fails",
       "introduced_in": "8.1",
       "fixed_in": "-",
-      "status": "NEW",
-      "last_updated": "2025-11-04T09:06:51Z",
+      "status": "ASSIGNED",
+      "last_updated": "2025-11-14T05:08:12Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2411947"
+    },
+    {
+      "id": "BZ-2415387",
+      "product": "ceph",
+      "title": "[Upstream-NFS]: PyNFS test failures with Ceph backend for 4.0",
+      "introduced_in": "9.0",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-11-17T13:56:37Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415387"
+    },
+    {
+      "id": "BZ-2415388",
+      "product": "ceph",
+      "title": "[Upstream-NFS]: PyNFS test failures with Ceph backend for 4.1",
+      "introduced_in": "9.0",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-11-17T14:00:04Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415388"
+    },
+    {
+      "id": "BZ-2415390",
+      "product": "ceph",
+      "title": "[Upstream-NFS]: PyNFS test failures with VFS backend + ACL Enabled for 4.0",
+      "introduced_in": "9.0",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-11-18T07:12:44Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415390"
+    },
+    {
+      "id": "BZ-2415392",
+      "product": "ceph",
+      "title": "[Upstream-NFS]: PyNFS test failures with VFS backend + ACL Enabled for 4.1",
+      "introduced_in": "9.0",
+      "fixed_in": "-",
+      "status": "NEW",
+      "last_updated": "2025-11-18T07:14:30Z",
+      "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415392"
     }
   ]
 }
