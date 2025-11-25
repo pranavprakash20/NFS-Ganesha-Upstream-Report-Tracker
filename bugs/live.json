@@ -166,8 +166,8 @@
       "title": "[Upstream-NFS]: PyNFS test failures with Ceph backend for 4.1",
       "introduced_in": "9.0",
       "fixed_in": "-",
-      "status": "NEW",
-      "last_updated": "2025-11-25T06:24:27Z",
+      "status": "ASSIGNED",
+      "last_updated": "2025-11-25T14:45:39Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415388"
     },
     {
@@ -176,8 +176,8 @@
       "title": "[Upstream-NFS]: PyNFS test failures with VFS backend + ACL Enabled for 4.0",
       "introduced_in": "9.0",
       "fixed_in": "-",
-      "status": "NEW",
-      "last_updated": "2025-11-18T07:12:44Z",
+      "status": "ASSIGNED",
+      "last_updated": "2025-11-25T14:42:53Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415390"
     },
     {
@@ -187,7 +187,7 @@
       "introduced_in": "9.0",
       "fixed_in": "-",
       "status": "NEW",
-      "last_updated": "2025-11-25T06:26:39Z",
+      "last_updated": "2025-11-25T14:41:51Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415392"
     },
     {
@@ -196,8 +196,8 @@
       "title": "[Upstream-NFS]: PyNFS test failures with GPFS backend for 4.0",
       "introduced_in": "9.0",
       "fixed_in": "-",
-      "status": "NEW",
-      "last_updated": "2025-11-24T14:28:35Z",
+      "status": "ASSIGNED",
+      "last_updated": "2025-11-25T14:38:42Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2416755"
     }
   ]
