@@ -46,8 +46,8 @@
       "title": "[4.0] pynfs test suite failures.",
       "introduced_in": "7.1",
       "fixed_in": "-",
-      "status": "ASSIGNED",
-      "last_updated": "2026-01-05T09:29:48Z",
+      "status": "POST",
+      "last_updated": "2026-01-13T14:55:29Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394516"
     },
     {
@@ -56,8 +56,8 @@
       "title": "[4.1] pynfs test suite failures",
       "introduced_in": "7.1",
       "fixed_in": "-",
-      "status": "ASSIGNED",
-      "last_updated": "2026-01-05T09:29:48Z",
+      "status": "POST",
+      "last_updated": "2026-01-13T14:55:52Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394517"
     },
     {
@@ -167,7 +167,7 @@
       "introduced_in": "9.0",
       "fixed_in": "-",
       "status": "ASSIGNED",
-      "last_updated": "2026-01-05T09:19:49Z",
+      "last_updated": "2026-01-13T14:58:53Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415388"
     },
     {
@@ -176,8 +176,8 @@
       "title": "[Upstream-NFS]: PyNFS test failures with VFS backend + ACL Enabled for 4.0",
       "introduced_in": "9.0",
       "fixed_in": "-",
-      "status": "ASSIGNED",
-      "last_updated": "2026-01-05T09:20:57Z",
+      "status": "MODIFIED",
+      "last_updated": "2026-01-13T15:01:30Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415390"
     },
     {
