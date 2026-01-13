@@ -126,8 +126,8 @@
       "title": "[NFS-Ganesha] [8.0] New LTP failures with latest build",
       "introduced_in": "8.0",
       "fixed_in": "-",
-      "status": "NEW",
-      "last_updated": "2026-01-05T09:29:48Z",
+      "status": "ASSIGNED",
+      "last_updated": "2026-01-13T14:40:40Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2403684"
     },
     {
@@ -146,8 +146,8 @@
       "title": "[NFS-Ganesha] With root_squash enabled operations on mount point fails",
       "introduced_in": "8.1",
       "fixed_in": "-",
-      "status": "ASSIGNED",
-      "last_updated": "2025-11-14T05:08:12Z",
+      "status": "POST",
+      "last_updated": "2026-01-13T14:45:54Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2411947"
     },
     {
