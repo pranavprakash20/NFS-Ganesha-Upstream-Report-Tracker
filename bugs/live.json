@@ -47,7 +47,7 @@
       "introduced_in": "7.1",
       "fixed_in": "-",
       "status": "POST",
-      "last_updated": "2026-01-13T14:55:29Z",
+      "last_updated": "2026-01-16T08:51:50Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394516"
     },
     {
@@ -57,7 +57,7 @@
       "introduced_in": "7.1",
       "fixed_in": "-",
       "status": "POST",
-      "last_updated": "2026-01-13T14:55:52Z",
+      "last_updated": "2026-01-16T08:51:57Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394517"
     },
     {
@@ -147,7 +147,7 @@
       "introduced_in": "8.1",
       "fixed_in": "-",
       "status": "POST",
-      "last_updated": "2026-01-13T14:45:54Z",
+      "last_updated": "2026-01-16T08:52:02Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2411947"
     },
     {
@@ -177,7 +177,7 @@
       "introduced_in": "9.0",
       "fixed_in": "-",
       "status": "MODIFIED",
-      "last_updated": "2026-01-13T15:01:30Z",
+      "last_updated": "2026-01-16T08:52:20Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2415390"
     },
     {
