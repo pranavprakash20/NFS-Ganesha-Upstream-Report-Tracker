@@ -76,8 +76,8 @@
       "title": "NFS-Ganesha crash in NFSv3 remove path \u2013 fsal_internal_close assertion failure (fd=-1)",
       "introduced_in": "7.1",
       "fixed_in": "-",
-      "status": "ASSIGNED",
-      "last_updated": "2026-01-21T14:07:24Z",
+      "status": "MODIFIED",
+      "last_updated": "2026-01-21T14:50:08Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2394519"
     },
     {
