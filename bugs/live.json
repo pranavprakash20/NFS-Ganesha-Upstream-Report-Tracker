@@ -146,8 +146,8 @@
       "title": "[NFS-Ganesha] With root_squash enabled operations on mount point fails",
       "introduced_in": "8.1",
       "fixed_in": "-",
-      "status": "POST",
-      "last_updated": "2026-01-16T08:52:02Z",
+      "status": "ASSIGNED",
+      "last_updated": "2026-01-21T09:25:45Z",
       "link": "https://bugzilla.redhat.com/show_bug.cgi?id=2411947"
     },
     {
