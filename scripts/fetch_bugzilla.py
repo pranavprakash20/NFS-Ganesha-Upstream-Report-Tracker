@@ -37,8 +37,6 @@ def normalize(b):
 
 
 def main():
-    print(API_KEY)
-    print(API_URL)
     url = API_URL  # no need to append ?api_key=
     raw = _http_get(url, API_KEY)
     data = json.loads(raw)
